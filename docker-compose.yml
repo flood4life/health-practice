@@ -1,0 +1,40 @@
+version: '3.8'
+
+volumes:
+  mongodb: {}
+
+services:
+  mongo:
+    image: mongo:4.4
+    command: --quiet
+    volumes:
+      - mongodb:/data/db
+  
+  redis:
+    image: redis:alpine
+
+  web:
+    build: .
+    ports:
+      - '3000:3000'
+    environment:
+      RAILS_ENV: development
+      RACK_ENV: development
+      MONGODB_HOSTS: mongo
+      REDIS_HOST: redis
+
+  checker:
+    image: ellerbrock/alpine-bash-curl-ssl
+    command: bash -c 'while true; do curl http://web:3000/healthiness 2>/dev/null; sleep 2; done'
+  
+  tests:
+    build: .
+    command: tests
+    depends_on:
+      - mongo
+      - redis
+    environment:
+      RAILS_ENV: test
+      RACK_ENV: test
+      MONGODB_HOSTS: mongo
+      REDIS_HOST: redis
