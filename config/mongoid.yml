@@ -1,0 +1,14 @@
+development:
+  clients:
+    default:
+      database: health_practice_development
+      hosts: [ <%= ENV.fetch("MONGODB_HOSTS", "localhost:27017") %> ]
+test:
+  clients:
+    default:
+      database: health_practice_test
+      hosts: [ <%= ENV.fetch("MONGODB_HOSTS", "localhost:27017") %> ]
+      options:
+        read:
+          mode: :primary
+        max_pool_size: 1
